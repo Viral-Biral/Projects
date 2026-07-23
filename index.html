@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Name — Mechanical Design Portfolio</title>
+<meta name="description" content="CAD portfolio — mechanical design and engineering projects.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- model-viewer: renders glTF/GLB files directly in the browser -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
+
+<style>
+  :root{
+    --paper: #eef0f0;
+    --sheet: #fbfbf9;
+    --line: #c3ccd2;
+    --ink: #12171b;
+    --ink-soft: #4b5560;
+    --navy: #1c3a56;
+    --accent: #e15511;
+    --radius: 2px;
+    --gutter: clamp(20px, 5vw, 64px);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-attachment: fixed;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    padding-bottom:64px; /* room for fixed title block */
+  }
+
+  a{ color:var(--navy); }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- registration corner marks ---------- */
+  .frame{ position:relative; }
+  .reg{ position:absolute; width:14px; height:14px; }
+  .reg--tl{ top:10px; left:10px; border-top:2px solid var(--navy); border-left:2px solid var(--navy); }
+  .reg--tr{ top:10px; right:10px; border-top:2px solid var(--navy); border-right:2px solid var(--navy); }
+  .reg--bl{ bottom:10px; left:10px; border-bottom:2px solid var(--navy); border-left:2px solid var(--navy); }
+  .reg--br{ bottom:10px; right:10px; border-bottom:2px solid var(--navy); border-right:2px solid var(--navy); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:1100px;
+    margin:24px auto 0;
+    padding:56px var(--gutter) 48px;
+    background:var(--sheet);
+    border:1px solid var(--line);
+  }
+  .hero h1{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:clamp(32px, 6vw, 56px);
+    letter-spacing:-.01em;
+    margin:14px 0 10px;
+    color:var(--navy);
+  }
+  .hero p.tagline{
+    max-width:52ch;
+    font-size:18px;
+    color:var(--ink-soft);
+    margin:0 0 28px;
+  }
+  .hero .links{
+    display:flex; flex-wrap:wrap; gap:18px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+  }
+  .hero .links a{ text-decoration:none; border-bottom:1px solid var(--navy); padding-bottom:2px; }
+  .hero .links a:hover{ border-color:var(--accent); color:var(--accent); }
+
+  /* ---------- sheets (projects) ---------- */
+  main{ max-width:1100px; margin:32px auto; padding:0 var(--gutter); display:flex; flex-direction:column; gap:32px; }
+
+  .sheet{
+    background:var(--sheet);
+    border:1px solid var(--line);
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    min-height:420px;
+    opacity:0; transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .sheet.is-visible{ opacity:1; transform:translateY(0); }
+  .sheet:nth-of-type(even){ grid-template-columns: 0.9fr 1.1fr; }
+  .sheet:nth-of-type(even) .sheet__viewer{ order:2; }
+
+  .sheet__viewer{ position:relative; background:#e7e9e4; border-right:1px solid var(--line); }
+  .sheet:nth-of-type(even) .sheet__viewer{ border-right:none; border-left:1px solid var(--line); }
+  .sheet__viewer model-viewer{ width:100%; height:100%; min-height:340px; --poster-color:transparent; }
+
+  .sheet__info{ padding:36px; display:flex; flex-direction:column; }
+  .sheet__info h2{ font-size:24px; margin:8px 0 12px; }
+  .sheet__desc{ color:var(--ink-soft); margin:0 0 20px; }
+
+  .sheet__meta{ margin:auto 0 0; display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:16px; padding-top:20px; border-top:1px dashed var(--line); }
+  .sheet__meta div{ display:flex; flex-direction:column; gap:2px; }
+  .sheet__meta dt{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .sheet__meta dd{ margin:0; font-size:14px; }
+
+  /* ---------- empty / add-your-own sheet ---------- */
+  .sheet--empty{ grid-template-columns:1fr; border-style:dashed; }
+  .sheet--empty .sheet__empty-inner{
+    margin:auto; text-align:center; max-width:46ch; padding:48px;
+  }
+  .sheet--empty .plus{ font-family:'IBM Plex Mono', monospace; font-size:40px; color:var(--accent); display:block; margin-bottom:12px; }
+  .sheet--empty code{ background:var(--paper); padding:2px 6px; border-radius:var(--radius); font-size:13px; }
+
+  footer{ max-width:1100px; margin:0 auto 96px; padding:32px var(--gutter); text-align:center; }
+  footer p{ color:var(--ink-soft); font-size:14px; }
+
+  /* ---------- fixed title block ---------- */
+  .titleblock{
+    position:fixed; left:0; right:0; bottom:0;
+    background:var(--navy); color:#f2f4f5;
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:10px var(--gutter);
+    border-top:2px solid var(--accent);
+    overflow:hidden; white-space:nowrap;
+  }
+  .titleblock span{ opacity:.9; }
+  .titleblock b{ color:#fff; }
+  .titleblock .tb-project{ flex:1; overflow:hidden; text-overflow:ellipsis; }
+
+  @media (max-width:760px){
+    .sheet, .sheet:nth-of-type(even){ grid-template-columns:1fr; }
+    .sheet:nth-of-type(even) .sheet__viewer{ order:0; border-left:none; border-right:none; border-bottom:1px solid var(--line); }
+    .sheet__viewer model-viewer{ min-height:260px; }
+    .titleblock{ font-size:10px; padding:8px 14px; }
+    .titleblock .tb-drawn{ display:none; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .sheet{ transition:none; opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero frame">
+    <span class="reg reg--tl"></span><span class="reg reg--tr"></span>
+    <span class="eyebrow">Mechanical Design — CAD Portfolio</span>
+    <h1>Your Name</h1>
+    <p class="tagline">Automobile / mechanical engineering student. Projects below are viewable and rotatable right in the browser — no CAD software or downloads required.</p>
+    <div class="links">
+      <a href="mailto:you@example.com">EMAIL</a>
+      <a href="https://linkedin.com/in/najmussadat/" target="_blank" rel="noopener">LINKEDIN</a>
+      <a href="https://github.com/Viral-Biral" target="_blank" rel="noopener">GITHUB</a>
+      <!--<a href="https://grabcad.com/yourname" target="_blank" rel="noopener">GRABCAD</a> GrabCAD account-->
+    </div>
+  </header>
+
+  <main>
+
+    <section class="sheet frame" id="sheet-1" data-title="Parallel Gripper — Lead Screw Actuation" data-sheet="01">
+      <span class="reg reg--tl"></span><span class="reg reg--br"></span>
+      <div class="sheet__viewer">
+        <model-viewer
+          src="/Models/jAW.glb"
+          alt="Placeholder sample model — replace with your own converted project"
+          camera-controls auto-rotate shadow-intensity="1" exposure="0.9">
+        </model-viewer>
+      </div>
+      <div class="sheet__info">
+        <p class="eyebrow">Sheet 01 — Sample model, replace me</p>
+        <h2>Parallel Gripper — Lead Screw Actuation</h2>
+        <p class="sheet__desc">Swap this paragraph for two or three sentences on the design problem, your approach, and what you'd change next time. Keep it short — the model does most of the talking.</p>
+        <dl class="sheet__meta">
+          <div><dt>Software</dt><dd>SolidWorks</dd></div>
+          <div><dt>Format</dt><dd>STEP → glTF</dd></div>
+          <div><dt>Status</dt><dd>Concept</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="sheet frame" id="sheet-2" data-title="Compression Test Fixture" data-sheet="02">
+      <span class="reg reg--tl"></span><span class="reg reg--br"></span>
+      <div class="sheet__viewer">
+        <model-viewer
+          src="/Models/A Planetary GearBox.glb"
+          alt="Placeholder sample model — replace with your own converted project"
+          camera-controls auto-rotate shadow-intensity="1" exposure="0.9">
+        </model-viewer>
+      </div>
+      <div class="sheet__info">
+        <p class="eyebrow">Sheet 02 — Sample model, replace me</p>
+        <h2>Compression Test Fixture</h2>
+        <p class="sheet__desc">Same idea: a couple of sentences on why the part looks the way it does, and any tolerance, material, or manufacturing constraint worth calling out.</p>
+        <dl class="sheet__meta">
+          <div><dt>Software</dt><dd>SolidWorks</dd></div>
+          <div><dt>Format</dt><dd>STEP → glTF</dd></div>
+          <div><dt>Status</dt><dd>Tested</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="sheet sheet--empty frame" id="sheet-3" data-title="Add your next project" data-sheet="03">
+      <span class="reg reg--tl"></span><span class="reg reg--br"></span>
+      <div class="sheet__empty-inner">
+        <span class="plus">+</span>
+        <p class="eyebrow">Sheet 03 — Open slot</p>
+        <p>Convert a part to <code>.glb</code>, drop it in a <code>/models</code> folder next to this file, copy one of the sheets above, and point <code>src</code> at your new file. That's the whole workflow.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p class="eyebrow">Drawn in HTML — hosted on GitHub Pages — rendered with &lt;model-viewer&gt;</p>
+  </footer>
+
+  <div class="titleblock" id="titleblock">
+    <span class="tb-drawn">DRAWN BY <b>Your Name</b></span>
+    <span class="tb-project" id="tb-project">PROJECT — Parallel Gripper — Lead Screw Actuation</span>
+    <span id="tb-sheet">SHEET 01/03</span>
+    <span>REV <b>A</b></span>
+  </div>
+
+<script>
+  const sheets = Array.from(document.querySelectorAll('.sheet'));
+  const total = sheets.length;
+  const tbProject = document.getElementById('tb-project');
+  const tbSheet = document.getElementById('tb-sheet');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion) {
+    document.querySelectorAll('model-viewer[auto-rotate]').forEach(m => m.removeAttribute('auto-rotate'));
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        const title = entry.target.dataset.title;
+        const num = entry.target.dataset.sheet;
+        tbProject.textContent = 'PROJECT — ' + title;
+        tbSheet.textContent = 'SHEET ' + num + '/' + String(total).padStart(2, '0');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sheets.forEach(s => io.observe(s));
+</script>
+
+</body>
+</html>
